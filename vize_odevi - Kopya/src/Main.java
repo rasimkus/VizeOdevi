@@ -3,6 +3,7 @@ import java.util.Scanner;
 import java.util.*;
 import javax.mail.*;
 import javax.mail.internet.*;
+
 public class Main {
     public static void main(String[] args) throws MessagingException {
         //eğer önceden bu kodla kullanicilar.txt dosyasını oluşturmadıysak dosyayı oluşturur
@@ -70,11 +71,11 @@ class KayitliUyeler{
             ElitUyeler kayitliElitKullanicilar[] = new ElitUyeler[5];
             //kayıtlı olan elitüyeleri ekledik
             kayitliElitKullanicilar[0] = new ElitUyeler("Serpil", "üstebay", "serpilçdeneme@deneme.com");
-            kayitliElitKullanicilar[1] = new ElitUyeler("ayse", "gükay", "aysegokay@deneme.com");
-            kayitliElitKullanicilar[2] = new ElitUyeler("Serpil", "üstebay", "serpilçdeneme@deneme.com");
+            kayitliElitKullanicilar[1] = new ElitUyeler("eda", "gök", "ela@email.com");
+            kayitliElitKullanicilar[2] = new ElitUyeler("ali", "gökten", "ali@email.com");
 
-            GenelUyeler kayitliGenelKullanicilar[] = new GenelUyeler[5];
-            kayitliGenelKullanicilar[0] = new GenelUyeler("genel", "kullanıcı", "kayitli");
+            GenelUyeler kayitliGenelKullanicilar[] = new GenelUyeler[1];
+            kayitliGenelKullanicilar[0] = new GenelUyeler("ayse", "ak", "ayse@email.com");
 
             FileWriter output = new FileWriter("kullanicilar.txt");
 
@@ -106,7 +107,7 @@ class ElitUyeler extends Uyeler{
         this.soyisim = soyad;
         this.email = eposta;
     }
-}1
+}
 class GenelUyeler extends Uyeler{
     GenelUyeler(String ad, String soyad, String eposta){
         this.isim = ad;
