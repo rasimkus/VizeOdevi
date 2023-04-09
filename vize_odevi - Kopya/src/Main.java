@@ -3,6 +3,8 @@ import java.util.Scanner;
 import java.util.*;
 import javax.mail.*;
 import javax.mail.internet.*;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 public class Main {
     public static void main(String[] args) throws MessagingException {
@@ -63,6 +65,27 @@ class DosyaKontrol{
         }
     }
 }
+
+class Uyeler{
+    //kalıtım bir is a ilişkisi olduğu için uyeler->genel uyeler ve uyeler->elit uyeler için kalıtım kullandım
+    String isim, soyisim, email;
+}
+class ElitUyeler extends Uyeler{
+    ElitUyeler(String ad, String soyad, String eposta){
+        this.isim = ad;
+        this.soyisim = soyad;
+        this.email = eposta;
+    }
+}
+class GenelUyeler extends Uyeler{
+    GenelUyeler(String ad, String soyad, String eposta){
+        this.isim = ad;
+        this.soyisim = soyad;
+        this.email = eposta;
+    }
+
+}
+
 class KayitliUyeler{
     //kullanicilar.txt dosyası oluşturup hali hazırda kayıtlı olan kişilerin bilgilerini bu dosyaya yazdırıyor
     KayitliUyeler(){
@@ -70,8 +93,8 @@ class KayitliUyeler{
             //elit üyeler dizisi oluşturur
             ElitUyeler kayitliElitKullanicilar[] = new ElitUyeler[5];
             //kayıtlı olan elitüyeleri ekledik
-            kayitliElitKullanicilar[0] = new ElitUyeler("Serpil", "üstebay", "serpilçdeneme@deneme.com");
-            kayitliElitKullanicilar[1] = new ElitUyeler("eda", "gök", "ela@email.com");
+            kayitliElitKullanicilar[0] = new ElitUyeler("Serpil", "üstebay", "serpil@deneme.edu.tr");
+            kayitliElitKullanicilar[1] = new ElitUyeler("eda", "gök", "eda@email.com");
             kayitliElitKullanicilar[2] = new ElitUyeler("ali", "gökten", "ali@email.com");
 
             GenelUyeler kayitliGenelKullanicilar[] = new GenelUyeler[1];
@@ -97,27 +120,14 @@ class KayitliUyeler{
         }
     }
 }
-class Uyeler{
-    //kalıtım bir is a ilişkisi olduğu için uyeler->genel uyeler ve uyeler->elit uyeler için kalıtım kullandım
-    String isim, soyisim, email;
-}
-class ElitUyeler extends Uyeler{
-    ElitUyeler(String ad, String soyad, String eposta){
-        this.isim = ad;
-        this.soyisim = soyad;
-        this.email = eposta;
-    }
-}
-class GenelUyeler extends Uyeler{
-    GenelUyeler(String ad, String soyad, String eposta){
-        this.isim = ad;
-        this.soyisim = soyad;
-        this.email = eposta;
-    }
-}
+
+
+
+
 class UyeEkleme {
     //ana menüde üye ekleme seçeneği seçildiğinde UyeEkleme classından nesne oluşturur ve constructor çalışır
     //aldığı elitlik parametresi girilen bilgilerin elit üyeler başlığı altına mı genel üyeler başlığı altına mı yazılacağını belirler
+
     UyeEkleme(boolean elitlik) throws MessagingException {
 
         try {
@@ -143,15 +153,9 @@ class UyeEkleme {
             int index;
             if (elitlik) {
                 index = contents.indexOf("#GENEL ÜYELER#") - 1;
-                //mail gönderilmek istenirse diye emaili elit üyelere mail atan classa gönderiyoruz
-                ElitUyelereMail nesnem = new ElitUyelereMail();
-                nesnem.email= nesnem.email+","+email;
             }
             else {
                 index = contents.indexOf("#GENEL ÜYELER#") + 15;
-                //mail gönderilmek istenirse diye emaili genel üyelere mail atan classa gönderiyoruz
-                GenelUyelereMail nesnem = new GenelUyelereMail();
-                nesnem.email= nesnem.email+","+email;
             }
 
             //belirlediğimiz noktaya inputu giriyoruz
@@ -172,9 +176,7 @@ class MailGondermeMenu{
     //ana sayfadan mail gönderme seçeneğini seçince çıkacak menüyü gösterir
     MailGondermeMenu() throws MessagingException {
         Scanner sc = new Scanner(System.in);
-        System.out.println("1- Elit üyelere mail");
-        System.out.println("2- Genel üyelere mail");
-        System.out.println("3- Tüm üyelere mail");
+        System.out.println("1- Tüm üyelere mail :( elit ve genel diye ayıramadım");
         int secenek = sc.nextInt();
         mailGonderme(secenek);
     }
@@ -183,153 +185,95 @@ class MailGondermeMenu{
     public void mailGonderme(int secenek) throws MessagingException {
         switch (secenek){
             case 1:
-                ElitUyelereMail nesnem = new ElitUyelereMail(1);
-                break;
-            case 2:
-                GenelUyelereMail nesnem1 = new GenelUyelereMail(1);
-                break;
-            case 3:
-                HerkeseMailGonderme nesnem2 = new HerkeseMailGonderme(1);
+                SendMail nesnem=new SendMail();
+                nesnem.MailSender();
                 break;
             default:
                 System.out.println("hatalı giriş yaptınız");
         }
     }
 }
-class ElitUyelereMail{
-    //kayitli kullanıcıların maillerini kaydediyoruz
-    //UyeEkleme'de de yeni eklenen kullanıcıların maillerini bu email stringine ekliyoruz
-    String email="serpil@deneme.edu.tr,eda@email.com,ali@email.com";
-    ElitUyelereMail(){}//overloading kullanabilmek için boş parametresiz constructor
-    ElitUyelereMail(int a) throws MessagingException {
-        //kullanıcıdan mail adresini şifresini ve yollayacağı maili alır
-        Scanner sc = new Scanner(System.in);
-        System.out.println("email adresinizi giriniz");
-        String gonderenEmail = sc.nextLine();
-        System.out.println("uygulama sifrenizi giriniz");
-        String gonderenSifre = sc.nextLine();
-        System.out.println("mailinizin konusunu giriniz");
-        String subject = sc.nextLine();
-        System.out.println("mailinizin içeriğini giriniz");
-        String body = sc.nextLine();
+class DosyadanMailBulma {
+    public ArrayList<String> Email() { // dosyadaki mail adreslerini bulup ArrayList olarak return eden method
 
-        //mail server properties kurulumu
-        Properties properties = new Properties();
-        properties.put("mail.smtp.host", "smtp.gmail.com");
-        properties.put("mail.smtp.port", "587");
-        properties.put("mail.smtp.auth", "true");
-        properties.put("mail.smtp.starttls.enable", "true");
-        properties.setProperty("mail.smtp.ssl.protocols", "TLSv1.2");
+        ArrayList<String> emails = new ArrayList<String>();
+        String fileName ="kullanicilar.txt" ;
 
-        //authenticatorle yeni bir session oluşturma
-        Authenticator auth = new Authenticator() {
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(gonderenEmail, gonderenSifre);
+        try {
+            // dosyayı okuyup mail adreslerini belirliyor ve bu mail adreslerini arrayliste kadediyoruz
+            BufferedReader reader = new BufferedReader(new FileReader(fileName));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                Pattern pattern = Pattern.compile("\\b[\\w.%-]+@[-.\\w]+\\.[A-Za-z]{2,4}\\b");
+                Matcher matcher = pattern.matcher(line);
+                while (matcher.find()) {
+                    String email = matcher.group();
+                    emails.add(email);
+                }
             }
-        };
-        Session session = Session.getInstance(properties, auth);
+            reader.close();
+        } catch (Exception e) { // hata ile karşılaşılırsa:
+            System.err.format("'%s' okunurken hata oluştu.", fileName);
+            e.printStackTrace();
+        }
+        // dosyadan okuduğumuz mail adreslerin kontrol ediyoruz
+        System.out.println(emails.size() + " tane adres bulundu");
+        for (String email : emails) {
+            System.out.println(email);
 
-        //maili oluşturur
-        Message msg = new MimeMessage(session);
-        msg.setFrom(new InternetAddress(gonderenEmail));
-        msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email, false));
-        msg.setSubject(subject);
-        msg.setText(body);
+        }
+        return emails; }
+}
+class SendMail extends DosyadanMailBulma {
 
-        //maili yollar
-        Transport.send(msg);
-        System.out.println("Mailiniz başarıyla yollanmıştır");
+    public void MailSender(){
+        // kalıtım yoluyla aldığımız arraylist:
+        ArrayList<String> emails = Email();
+        Scanner scn = new Scanner(System.in);
+
+        // host olarak kullandığımız mail adresinin bilgileri
+        final String username = "ilaydatiryaki25@gmail.com";
+        final String password = "gutszhelinvdvwwg"; // 2 adımlı doğrulama şifresi
+
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+
+        Session session = Session.getInstance(props,
+                new javax.mail.Authenticator() {
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(username, password);
+                    }
+                });
+
+        try {
+
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress("ilaydatiryaki25@gmail.com"));
+
+            for (String address : emails) { // kalıtım ile aldığımız arrayListteki mail adreslerini tek tek atıyoruz
+                message.addRecipients(Message.RecipientType.TO, InternetAddress.parse(address));
+            }
+
+            // mailin içerik bilgisini alıyoruz
+            System.out.println("mailinizin konusunu giriniz:");
+            String subject = scn.nextLine();
+            message.setSubject(subject);
+            System.out.println("mailinizin içeriğini giriniz:");
+            String body = scn.nextLine();
+            message.setText(body);
+
+
+            // maili gönderiyoruz
+            Transport.send(message);
+
+            System.out.println("Mail gönderme başarılı!");
+
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
-class GenelUyelereMail{
-    //kayitli kullanıcıların maillerini kaydediyoruz
-    //UyeEkleme'de de yeni eklenen kullanıcıların maillerini bu email stringine ekliyoruz
-    String email="ayse@email.com";
-    GenelUyelereMail(){}//overloading kullanabilmek için boş parametresiz constructor
-    GenelUyelereMail(int a) throws MessagingException {
-        //kullanıcıdan mail adresini şifresini ve yollayacağı maili alır
-        Scanner sc = new Scanner(System.in);
-        System.out.println("email adresinizi giriniz");
-        String gonderenEmail = sc.nextLine();
-        System.out.println("uygulama sifrenizi giriniz");
-        String gonderenSifre = sc.nextLine();
-        System.out.println("mailinizin konusunu giriniz");
-        String subject = sc.nextLine();
-        System.out.println("mailinizin içeriğini giriniz");
-        String body = sc.nextLine();
 
-        //mail server properties kurulumu
-        Properties properties = new Properties();
-        properties.put("mail.smtp.host", "smtp.gmail.com");
-        properties.put("mail.smtp.port", "587");
-        properties.put("mail.smtp.auth", "true");
-        properties.put("mail.smtp.starttls.enable", "true");
-        properties.setProperty("mail.smtp.ssl.protocols", "TLSv1.2");
-
-        //authenticatorle yeni bir session oluşturma
-        Authenticator auth = new Authenticator() {
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(gonderenEmail, gonderenSifre);
-            }
-        };
-        Session session = Session.getInstance(properties, auth);
-
-        //maili oluşturur
-        Message msg = new MimeMessage(session);
-        msg.setFrom(new InternetAddress(gonderenEmail));
-        msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email, false));
-        msg.setSubject(subject);
-        msg.setText(body);
-
-        //maili yollar
-        Transport.send(msg);
-        System.out.println("Mailiniz başarıyla yollanmıştır");
-    }
-}
-class HerkeseMailGonderme{
-    HerkeseMailGonderme(){}//overloading kullanabilmek için boş parametresiz constructor
-    HerkeseMailGonderme(int a) throws MessagingException {
-        //ElitUyelerMail ve GenelUyelereMail classlarında oluşturduğumuz email stringlerini birleştirip bu classtaki email stringine atar
-        ElitUyelereMail nesnem1 = new ElitUyelereMail();
-        GenelUyelereMail nesnem2 = new GenelUyelereMail();
-        String email = nesnem1.email+","+nesnem2.email;
-
-        //kullanıcıdan mail adresini şifresini ve yollayacağı maili alır
-        Scanner sc = new Scanner(System.in);
-        System.out.println("email adresinizi giriniz");
-        String gonderenEmail = sc.nextLine();
-        System.out.println("uygulama sifrenizi giriniz");
-        String gonderenSifre = sc.nextLine();
-        System.out.println("mailinizin konusunu giriniz");
-        String subject = sc.nextLine();
-        System.out.println("mailinizin içeriğini giriniz");
-        String body = sc.nextLine();
-
-        //mail server properties kurulumu
-        Properties properties = new Properties();
-        properties.put("mail.smtp.host", "smtp.gmail.com");
-        properties.put("mail.smtp.port", "587");
-        properties.put("mail.smtp.auth", "true");
-        properties.put("mail.smtp.starttls.enable", "true");
-        properties.setProperty("mail.smtp.ssl.protocols", "TLSv1.2");
-
-        //authenticator ile yeni bir session oluşturma
-        Authenticator auth = new Authenticator() {
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(gonderenEmail, gonderenSifre);
-            }
-        };
-        Session session = Session.getInstance(properties, auth);
-
-        //maili oluşturur
-        Message msg = new MimeMessage(session);
-        msg.setFrom(new InternetAddress(gonderenEmail));
-        msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email, false));
-        msg.setSubject(subject);
-        msg.setText(body);
-
-        //maili yollar
-        Transport.send(msg);
-        System.out.println("Mailiniz başarıyla yollanmıştır");
-    }
-}
