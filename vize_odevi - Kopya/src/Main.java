@@ -230,10 +230,13 @@ class SendMail extends DosyadanMailBulma {
         // kalıtım yoluyla aldığımız arraylist:
         ArrayList<String> emails = Email();
         Scanner scn = new Scanner(System.in);
-
-        // host olarak kullandığımız mail adresinin bilgileri
-        final String username = "ilaydatiryaki25@gmail.com";
-        final String password = "gutszhelinvdvwwg"; // 2 adımlı doğrulama şifresi
+        
+        Scanner sc= new Scanner(System.in);
+        System.out.println("email adresinizi giriniz:");
+        String username=sc.nextLine();
+        System.out.println("iki adımlı doğrulama şifrenizi giriniz");
+        String password=sc.nextLine();
+        
 
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
