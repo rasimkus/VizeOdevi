@@ -254,7 +254,7 @@ class SendMail extends DosyadanMailBulma {
         try {
 
             Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress("ilaydatiryaki25@gmail.com"));
+            message.setFrom(new InternetAddress(username));
 
             for (String address : emails) { // kalıtım ile aldığımız arrayListteki mail adreslerini tek tek atıyoruz
                 message.addRecipients(Message.RecipientType.TO, InternetAddress.parse(address));
